@@ -9,17 +9,28 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GenerateValue {
+    //Название файла, куда будут сохраняться сгенерированные значения. Путь - корень проекта
     public static final String PATH = "SystemAnalyze";
+    //Вспомогательная переменная для округления чисел
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
+    //Вспомогательная переменная для генерации чисел (хранит 3 "магических числа")
     private final Config config;
+    //Начало интервала
     private final double a = 0.0;
+    //Конец интервала
     private final double b = 1.0;
+    //Коллекция сгенерированных чисел
+    private final List<BigDecimal> generatedValues;
 
     public GenerateValue(Config config) {
         this.config = config;
+        //При инциализации объекта, вызывается метод для генерации чисел
+        generatedValues = generateValues(config.getLoopSize());
     }
 
     public List<BigDecimal> generateValues(int loopSize) {
@@ -27,11 +38,17 @@ public class GenerateValue {
         BigDecimal RnMinusOne = config.getR();
         try (BufferedWriter writer = Files.newBufferedWriter(Path.of(PATH), StandardCharsets.UTF_8)) {
             for (int i = 0; i < loopSize; i++) {
+                //Шаг 1. Коэффициент a умножается на число Rn-1 ;
                 BigDecimal aRnMinusOne = config.getA().multiply(RnMinusOne);
+                //Шаг 2. Результат умножения aRn-1 делится на m и извлекается остаток
                 BigDecimal Rn = aRnMinusOne.remainder(config.getM());
+                //Остаток от деления Rn делится на m, чтобы получить искомое случайное число между нулем и единицей
                 BigDecimal generatedValue = Rn.divide(config.getM(), 10, RoundingMode.DOWN);
+                //Добавление числа в коллекцию
                 generatedValues.add(generatedValue);
+                //Запись числа в файл
                 writer.write(generatedValue + "\n");
+                //Для получения следующего числа в качестве Rn-1 принимается остаток от деления Rn, полученный на втором шаге
                 RnMinusOne = Rn;
             }
         } catch (IOException e) {
@@ -40,41 +57,51 @@ public class GenerateValue {
         return generatedValues;
     }
 
-    public void getPL() {
+    public Map<String, Integer> getPL() {
+        Map<String, Integer> resultMap = new HashMap<>();
         List<Integer> listOfI = new ArrayList<>();
-        List<BigDecimal> generatedValues;
-
-        generatedValues = generateValues(config.getLoopSize());
-        BigDecimal Xv = generatedValues.get(99999);
-        generatedValues = generateValues(config.getLoopSize() * 2);
+        // Извлечение последнего элемента из коллекции.
+        // generatedValues.size() - 1 потому-что в коллекции индексация начинается с 0
+        BigDecimal Xv = generatedValues.get(generatedValues.size() - 1);
+        // Проходим по всей коллекции и ищем числа равные Xv.Если такое есть, то сохраняем его индекс в лист
         for (int i = 0; i < generatedValues.size(); i++) {
             if (generatedValues.get(i).equals(Xv)) {
                 listOfI.add(i);
             }
         }
-
-        int P = listOfI.get(1) - listOfI.get(0);
-        for (int i = 0; i < generatedValues.size(); i++) {
-            BigDecimal xi3 = generatedValues.get(i);
-            BigDecimal xi3PlusP = generatedValues.get(P + i);
-            if (xi3.equals(xi3PlusP)) {
-                System.out.println("i3 = " + i
-                        + "\nP = " + P
-                        + "\nL = " + (i + P));
-                return;
+        //Вычисляем i3, P, L, если число индексов 2 и более.
+        //Если индексов меньше, значит нужно указать большее кол-во генерируемых элементов
+        if (listOfI.size() > 1) {
+            // P = i2 - i1
+            int P = listOfI.get(1) - listOfI.get(0);
+            resultMap.put("i1", listOfI.get(0));
+            resultMap.put("i2", listOfI.get(1));
+            resultMap.put("P", P);
+            //Поиск минимального i3, для которого выполняется xi3=xi3+p.
+            for (int i = 0; i < generatedValues.size(); i++) {
+                BigDecimal xi3 = generatedValues.get(i);
+                BigDecimal xi3PlusP = generatedValues.get(P + i);
+                if (xi3.equals(xi3PlusP)) {
+                    resultMap.put("i3", i);
+                    resultMap.put("L", i + P);
+                    return resultMap;
+                }
             }
         }
+        return resultMap;
     }
 
     public List<Integer> getIntervals() {
-        List<BigDecimal> generatedValues = generateValues(config.getLoopSize());
+        //Коллекция для хранения вхождений
         List<Integer> occurrences = new ArrayList<>();
+        // Границы интервалов
         double start = 0;
         double step = 0.05;
         double end = start + step;
         while (end < 1.05) {
             int counter = 0;
             for (BigDecimal b : generatedValues) {
+                // Фиксируется количество попаданий в каждый i-й интервал
                 if (b.doubleValue() >= start && b.doubleValue() <= end) {
                     counter++;
                 }
@@ -87,10 +114,10 @@ public class GenerateValue {
     }
 
     public String get2KDivideN() {
-        List<BigDecimal> generatedValues = generateValues(config.getLoopSize());
         List<Double> even = new ArrayList<>();
         List<Double> odd = new ArrayList<>();
         int counter = 0;
+        //Фильтрация сгенерируемых чисел по их индексу. Четные идут в even, нечетные - odd
         for (int i = 0; i < generatedValues.size(); i++) {
             if (i % 2 == 0) {
                 even.add(generatedValues.get(i).doubleValue());
@@ -100,6 +127,8 @@ public class GenerateValue {
         }
 
         for (int i = 0; i < generatedValues.size() / 2; i++) {
+            //Проверяется выполнение условия (x2i-1)^2 + (x2i)^2 < 1
+            //(x2i-1) - нечетные индексы, (x2i) - четные
             if (odd.get(i) * odd.get(i) + even.get(i) * even.get(i) < 1) {
                 counter++;
             }
