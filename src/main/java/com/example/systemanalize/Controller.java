@@ -1,5 +1,7 @@
 package com.example.systemanalize;
 
+import com.example.systemanalize.configs.GenerateValueConfig;
+import com.example.systemanalize.utils.Utils;
 import javafx.fxml.FXML;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.XYChart;
@@ -7,7 +9,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 
 import java.util.List;
-import java.util.Map;
 
 public class Controller {
     @FXML
@@ -55,7 +56,7 @@ public class Controller {
     @FXML
     void generate() {
         //Создание вспомогательного объекта для генерации чисел
-        Config config = new Config(
+        GenerateValueConfig config = new GenerateValueConfig(
                 //Чтение введеных "магических чисел"
                 R.getText(),
                 a.getText(),
@@ -65,8 +66,11 @@ public class Controller {
         );
         // Создание класса для генерации чисел
         GenerateValue generateValue = new GenerateValue(config);
+
+        //ist<BigDecimal> gaus = generateValue.gauss();
+        List<Double> gaus = null;
         //Получение интервалов вхождений для построения гистограммы
-        List<Integer> listOfIntervals = generateValue.getIntervals();
+        List<Integer> listOfIntervals = Utils.getIntervals(gaus);
         //Построение гистограммы
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         for (int i = 0; i < 20; i++) {
@@ -80,12 +84,12 @@ public class Controller {
         matExpect.setText(generateValue.getMatExpect());
         dkDivideN.setText(generateValue.get2KDivideN());
         //Получение и установка i1, i2, i3, P, L
-        Map<String, Integer> iPLmap = generateValue.getPL();
-        i1.setText(iPLmap.getOrDefault("i1", 0).toString());
-        i2.setText(iPLmap.getOrDefault("i2", 0).toString());
-        i3.setText(iPLmap.getOrDefault("i3", 0).toString());
-        P.setText(iPLmap.getOrDefault("P", 0).toString());
-        L.setText(iPLmap.getOrDefault("L", 0).toString());
+        //Map<String, Integer> iPLmap = generateValue.getPL();
+//        i1.setText(iPLmap.getOrDefault("i1", 0).toString());
+//        i2.setText(iPLmap.getOrDefault("i2", 0).toString());
+//        i3.setText(iPLmap.getOrDefault("i3", 0).toString());
+//        P.setText(iPLmap.getOrDefault("P", 0).toString());
+//        L.setText(iPLmap.getOrDefault("L", 0).toString());
     }
 
 }
