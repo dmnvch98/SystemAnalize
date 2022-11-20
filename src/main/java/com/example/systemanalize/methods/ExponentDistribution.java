@@ -40,6 +40,4 @@ public class ExponentDistribution implements DistributionImitation {
     public String getsrKvdrOtkl() {
         return String.valueOf(1 / distributionConfig.getLambda());
     }
-
-
 }
