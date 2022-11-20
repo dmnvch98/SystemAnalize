@@ -5,54 +5,53 @@ import com.example.systemanalize.configs.DistributionConfig;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GaussDistribution implements DistributionImitation {
+public class GammaDistribution implements DistributionImitation {
     private final List<Double> generatedValues;
 
     private final DistributionConfig distributionConfig;
 
-    public GaussDistribution(List<Double> generatedValues, DistributionConfig distributionConfig) {
+    public GammaDistribution(List<Double> generatedValues, DistributionConfig distributionConfig) {
         this.generatedValues = generatedValues;
         this.distributionConfig = distributionConfig;
     }
 
     @Override
     public List<Double> imitateDistribution() {
-        List<Double> gauss = new ArrayList<>();
-
-        int init = 0;
-        int step = 6;
-        int end = init + step;
+        List<Double> result = new ArrayList<>();
+        int init = 0; //0
+        int end = init + distributionConfig.getEta(); //1
         while (true) {
             if (end < generatedValues.size()) {
                 double y = 0;
                 for (int i = init; i < end; i++) {
                     y += generatedValues.get(i);
                 }
-                double x = (distributionConfig.getMatOzh() + distributionConfig.getSrKvdrOtkl())
-                        * Math.sqrt(2) * (y - 3);
+                double x = (-1 / distributionConfig.getLambda()) * Math.log10(y);
                 if (x >= 0 && x <= 1) {
-                    gauss.add(x);
+                    result.add(x);
                 }
                 init += 1;
-                end = init + 5;
+                end += 1;
             } else {
-                return gauss;
+                return result;
             }
         }
     }
 
     @Override
     public String getMatExpect() {
-        return String.valueOf(distributionConfig.getMatOzh());
+        double result = distributionConfig.getEta() / distributionConfig.getLambda();
+        return String.valueOf(result);
     }
 
     @Override
     public String getDispersion() {
-        return "-";
+        double result = distributionConfig.getEta() / (distributionConfig.getLambda() * distributionConfig.getLambda());
+        return String.valueOf(result);
     }
 
     @Override
     public String getsrKvdrOtkl() {
-        return String.valueOf(distributionConfig.getSrKvdrOtkl());
+        return "-";
     }
 }

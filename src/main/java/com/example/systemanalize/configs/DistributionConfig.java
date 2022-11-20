@@ -5,6 +5,8 @@ public class DistributionConfig {
     private Double SrKvdrOtkl;
     private Double lambda;
 
+    private int eta;
+
     public Double getMatOzh() {
         return matOzh;
     }
@@ -27,5 +29,13 @@ public class DistributionConfig {
 
     public void setLambda(Double lambda) {
         this.lambda = lambda;
+    }
+
+    public int getEta() {
+        return eta;
+    }
+
+    public void setEta(int eta) {
+        this.eta = eta;
     }
 }

@@ -25,4 +25,21 @@ public class ExponentDistribution implements DistributionImitation {
         }
         return result;
     }
+
+    @Override
+    public String getMatExpect() {
+        return String.valueOf(1 / distributionConfig.getLambda());
+    }
+
+    @Override
+    public String getDispersion() {
+        return "-";
+    }
+
+    @Override
+    public String getsrKvdrOtkl() {
+        return String.valueOf(1 / distributionConfig.getLambda());
+    }
+
+
 }

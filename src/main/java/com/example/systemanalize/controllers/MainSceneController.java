@@ -4,10 +4,7 @@ import com.example.systemanalize.Application;
 import com.example.systemanalize.configs.GenerateValueConfig;
 import com.example.systemanalize.GenerateValue;
 import com.example.systemanalize.configs.DistributionConfig;
-import com.example.systemanalize.methods.DistributionImitation;
-import com.example.systemanalize.methods.ExponentDistribution;
-import com.example.systemanalize.methods.GaussDistribution;
-import com.example.systemanalize.methods.UniformDistribution;
+import com.example.systemanalize.methods.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -45,6 +42,9 @@ public class MainSceneController {
     @FXML
     private TextField matOzh;
 
+    @FXML
+    private TextField eta;
+
     public void switchToSecondScene(ActionEvent event, String selectedMethod, DistributionImitation distributionImitation)
             throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Application.class.getResource("secondScene.fxml"));
@@ -64,7 +64,7 @@ public class MainSceneController {
     @FXML
     void initialize() {
         List<String> methods = Arrays.asList("Равномерное распределение", "Распределение Гаусса",
-                "Экспоненциальное распределение");
+                "Экспоненциальное распределение", "Гамма распределение");
         selectMethod.getItems().addAll(methods);
     }
 
@@ -84,7 +84,7 @@ public class MainSceneController {
         switch(selectedMethod) {
             case "Распределение Гаусса" -> {
                 distributionConfig.setMatOzh(Double.parseDouble(matOzh.getText()));
-                distributionConfig.setSrKvdrOtkl(Double.parseDouble(matOzh.getText()));
+                distributionConfig.setSrKvdrOtkl(Double.parseDouble(SrKvdrOtkl.getText()));
                 distributionImitation = new GaussDistribution(generateValue.getGeneratedValues(), distributionConfig);
             }
             case "Равномерное распределение" -> distributionImitation =
@@ -92,6 +92,11 @@ public class MainSceneController {
             case "Экспоненциальное распределение" -> {
                 distributionConfig.setLambda(Double.parseDouble(lambda.getText()));
                 distributionImitation = new ExponentDistribution(generateValue.getGeneratedValues(), distributionConfig);
+            }
+            case "Гамма распределение" -> {
+                distributionConfig.setLambda(Double.parseDouble(lambda.getText()));
+                distributionConfig.setEta(Integer.parseInt(eta.getText()));
+                distributionImitation = new GammaDistribution(generateValue.getGeneratedValues(), distributionConfig);
             }
         }
         switchToSecondScene(event, selectedMethod, distributionImitation);

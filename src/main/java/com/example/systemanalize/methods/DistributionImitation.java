@@ -5,4 +5,8 @@ import java.util.List;
 
 public interface DistributionImitation {
     List<Double> imitateDistribution();
+    String getMatExpect();
+    String getDispersion();
+    String getsrKvdrOtkl();
+
 }

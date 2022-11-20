@@ -12,6 +12,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.XYChart;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -26,6 +27,15 @@ public class SecondSceneController implements Initializable {
     public void setDistributionImitation(DistributionImitation distributionImitation) {
         this.distributionImitation = distributionImitation;
     }
+
+    @FXML
+    private Text matExpect;
+
+    @FXML
+    private Text srKvdrOtkl;
+
+    @FXML
+    private Text dispersion;
 
     @FXML
     private BarChart<String, Number> barChart;
@@ -57,5 +67,8 @@ public class SecondSceneController implements Initializable {
         }
         barChart.getData().clear();
         barChart.getData().add(series);
+        srKvdrOtkl.setText(distributionImitation.getsrKvdrOtkl());
+        dispersion.setText(distributionImitation.getDispersion());
+        matExpect.setText(distributionImitation.getMatExpect());
     }
 }
