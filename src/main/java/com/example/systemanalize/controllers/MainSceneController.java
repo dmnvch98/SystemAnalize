@@ -64,18 +64,18 @@ public class MainSceneController {
     @FXML
     void initialize() {
         List<String> methods = Arrays.asList("Равномерное распределение", "Распределение Гаусса",
-                "Экспоненциальное распределение", "Гамма распределение");
+                "Экспоненциальное распределение", "Гамма распределение", "Треугольное распределение");
         selectMethod.getItems().addAll(methods);
     }
 
     public void start(ActionEvent event) throws IOException {
         GenerateValueConfig config = new GenerateValueConfig(
                 //Чтение введеных "магических чисел"
-//                R.getText(),
-//                a.getText(),
-//                m.getText(),
-//                Integer.parseInt(qty.getText())
-                "4294967291", "1073741824", "4294967293", 100000
+                R.getText(),
+                a.getText(),
+                m.getText(),
+                Integer.parseInt(qty.getText())
+          //      "4294967291", "1073741824", "4294967293", 100000
         );
         GenerateValue generateValue = new GenerateValue(config);
         DistributionImitation distributionImitation = null;
@@ -98,6 +98,8 @@ public class MainSceneController {
                 distributionConfig.setEta(Integer.parseInt(eta.getText()));
                 distributionImitation = new GammaDistribution(generateValue.getGeneratedValues(), distributionConfig);
             }
+            case "Треугольное распределение" -> distributionImitation
+                    = new TriangleDistribution(generateValue.getGeneratedValues());
         }
         switchToSecondScene(event, selectedMethod, distributionImitation);
     }

@@ -8,29 +8,30 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UniformDistribution implements DistributionImitation {
+public class TriangleDistribution implements DistributionImitation {
     private final List<Double> generatedValues;
-    //Начало интервала
-    private final double a = 0.0;
-    //Конец интервала
-    private final double b = 1.0;
 
-    private final static String PATH = "Имитация равномерного распределения";
+    private final static String PATH = "Имитация треугольного распределения";
 
-    public UniformDistribution(List<Double> generatedValues) {
+    double a = 0;
+    double b = 1;
+
+    public TriangleDistribution(List<Double> generatedValues) {
         this.generatedValues = generatedValues;
     }
 
     @Override
     public List<Double> imitateDistribution() {
-        double a = 0.00;
-        double b = 1.00;
         List<Double> result = new ArrayList<>();
         try (BufferedWriter writer = Files.newBufferedWriter(Path.of(PATH), StandardCharsets.UTF_8)) {
-            for (Double value: generatedValues) {
-                double resultValue = a + (b - a) * value;
-                result.add(resultValue);
-                writer.write(resultValue + "\n");
+            for (int i = 0; i < generatedValues.size(); i++) {
+                if (i < generatedValues.size() - 1) {
+                    if (generatedValues.get(i) < generatedValues.get(i + 1)) {
+                        double resultValue = a + (b - a) * generatedValues.get(i);
+                        result.add(resultValue);
+                        writer.write(resultValue + "\n");
+                    }
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -40,17 +41,16 @@ public class UniformDistribution implements DistributionImitation {
 
     @Override
     public String getMatExpect() {
-        return String.valueOf((a + b) / 2);
+        return null;
     }
 
     @Override
     public String getDispersion() {
-        double result = ((b - a) * (b - a)) / 12;
-        return String.valueOf(result);
+        return null;
     }
 
     @Override
     public String getsrKvdrOtkl() {
-        return "-";
+        return null;
     }
 }
